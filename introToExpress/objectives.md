@@ -1,26 +1,23 @@
-# Intro to Express
-* What is a framework? How is it different from a library?
-* Libraries: jquery & bootstrap & other code that we can include in our app
-* Express is a framework. Control flow is already in framework, few spots to change up
-* Both libraries and frameworks are external code that can be added to your application but
-* Library is something you are in control of, framework gives up a little bit of control
-* Framework gives basic groundwork.
-* Express is a lightweight framework meaning that you still have to fill in a lot, doesn't hide anything from you
+# intro to express
+* What's a framework? How' it diff from a library?
+*   - Inversion of control, library (you're in control), framework calls you (control is inverted)
+* What is Express?
+*   - Express is a web development Node framework
+* Why use Express?
+*   - Most widely used framework. Lightweight framework. Must understand how things work.
 
-# NPM Init and package.json
-* Use the `--save` flag to install packages
-* --save saves dependency to package.json under dependencies
-Every NPM package we use has a package.json file
-JSON: javascript object notation, data type to represent structure
-* What package.json file does
-Holds meta data relevant to a specific project
-* `npm init` to create a new package.json
+# first express app
+* Review existing app
+* Review HTTP response/request lifecycle
+* Create own simple Express app
+* Routes are responsible for listening and receiving requests and then run some other code depending on the request
 
-
-# More routing
-* show the `*` route matcher
-*   this is the catch all other undefined routes route
-* write routes containing route parameters
-* discuss route order
-*   order of routes matter so if this get * request is added before all others, nothing else matters
-*   the first request that matches will be the only route to run
+# npm init and package.json
+* Use '--save' flag to install packages
+* Explain package.json file, what it do
+*   - every npm package that we use has a file called package.json
+*   - javascipt object notation (json)
+*   - package.json contains all the metadeta and dependencies relevant for that specific package/project
+*   - package.json is a recipe for all the package dependencies, list of packages that it needs
+*   - --save, when npm install with --save it will install the package and its version AND automatically save it as dependency in package.json file
+* Use 'npm init' to create a new package.json

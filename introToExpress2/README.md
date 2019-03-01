@@ -17,3 +17,7 @@
 * use partials to dry up code
 *  - make partials directory, to have html header and footer, for drying up code so we dont have to explicitely input headers and footers to each template
 
+# Post requests
+* write post routes, test with postman
+* use form to send post requests
+* use body parser to get form data

@@ -1,33 +1,17 @@
 var express = require("express"),
     app = express(),
     bodyParser = require("body-parser"),
-    mongoose = require("mongoose");
+    mongoose = require("mongoose"),
+    Campground = require("./models/campground.js"),
+    Comment = require("./models/comment.js"),
+    seedDB = require("./seeds");
+
 
 mongoose.connect("mongodb://localhost/yelp_camp", { useNewUrlParser: true });
-
-// start schema setup
-var campgroundSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    description: String
-});
-var Campground = mongoose.model("Campground", campgroundSchema);
-
-// Campground.create(
-//     {
-//         name: "Salmon Creek", 
-//         image: "https://cdn.pixabay.com/photo/2018/03/11/20/42/mammals-3218028__340.jpg",
-//         description: "This camp is awesome."
-//     }, function (err, campground) {
-//         if (err) console.log(err);
-//         else console.log(campground);
-//     }
-// );
-
-// end scheme setup
-
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+app.use(express.static(__dirname + "/public"));
+// seedDB(); // use the first time it is run
 
 app.get("/", function(req,res) {
     res.render("landing.ejs");
@@ -41,7 +25,7 @@ app.get("/campgrounds", function(req, res) {
         if (err) {
             console.log(err);
         } else {
-            res.render("index.ejs", {campgrounds: campgrounds_db});
+            res.render("campgrounds/index.ejs", {campgrounds: campgrounds_db});
         }
     });
 });
@@ -67,16 +51,62 @@ app.post("/campgrounds", function(req,res) {
 
 // NEW route which displays form to create new campground
 app.get("/campgrounds/new", function(req, res) {
-    res.render("new.ejs");
+    res.render("./campgrounds/new.ejs");
 });
 
 // SHOW route
 app.get("/campgrounds/:id", function(req,res) {
     // find campground with provided id
     // render show template with that campground
-    Campground.findById(req.params.id, function(err, foundCampground) {
+    // Campground.findById(req.params.id, function(err, foundCampground) {
+    //     if (err) console.log(err);
+    //     else res.render("show.ejs", {campground: foundCampground});
+    // });
+    
+    // finding campground, populating comments on that campground, executing the query; should look like comments, not just ids
+    Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground) {
         if (err) console.log(err);
-        else res.render("show.ejs", {campground: foundCampground});
+        else {
+            // console.log(foundCampground);
+            res.render("./campgrounds/show.ejs", {campground: foundCampground});
+        }
+    });
+});
+
+// =====================================
+// COMMENTS ROUTES
+
+// NEW
+app.get("/campgrounds/:id/comments/new", function(req,res) {
+    // res.send("comments form");
+    // res.render("./comments/new.ejs");
+    // find campground by id
+    Campground.findById(req.params.id, function(err, campground){
+        if (err) console.log(err);
+        else {
+            res.render("./comments/new.ejs", {campground: campground});
+        }
+    });
+});
+
+app.post("/campgrounds/:id/comments", function(req,res) {
+    // lookup campground using ID
+    Campground.findById(req.params.id, function(err,campground){
+        if (err) res.redirect("/campgrounds");
+        else {
+            // create new comment
+            // connect new comment to campground
+            // redirect campground showpage
+            Comment.create(req.body.comment, function(err, comment) {
+                if (err) console.log(err);
+                else {
+                    console.log("comment created");
+                    campground.comments.push(comment);
+                    campground.save();
+                    res.redirect("/campgrounds/" + campground._id);
+                }
+            });
+        }
     });
 });
 
@@ -104,5 +134,14 @@ UPDATE          /dogs/:id       PUT             update a particular dog, redirec
 DESTROY         /dogs/:id       DELETE          deletes a particular dog, redirects somewhere, usually index to show dog has been deleted
 
 * dogs can be any other thing like blogs, or places, campgrounds, etc.
+
+
+INDEX   /campgrounds        GET
+NEW     /campgrounds/new    GET
+CREATE  /campgrounds        POST
+SHOW    /campgrounds/:id    GET
+
+NEW     /campgrounds/:id/comments/new       GET
+CREATE  /campgrounds/:id/comments           POST
 
 */
